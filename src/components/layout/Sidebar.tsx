@@ -1,5 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, RefreshCw, Bell, BarChart3, Radio, Settings } from "lucide-react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { LayoutDashboard, Package, RefreshCw, Bell, BarChart3, Radio, Settings, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
