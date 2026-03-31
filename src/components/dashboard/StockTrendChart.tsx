@@ -1,10 +1,17 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { stockTrends } from "@/data/mockData";
+import { useState, useEffect } from "react";
+import { api } from "@/data/api";
 
 const StockTrendChart = () => {
+  const [trends, setTrends] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.trends.getAll().then(setTrends);
+  }, []);
+
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <AreaChart data={stockTrends} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+      <AreaChart data={trends} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
         <defs>
           <linearGradient id="colorInStock" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="hsl(142 71% 45%)" stopOpacity={0.3} />

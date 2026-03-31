@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import CustomerLayout from "@/components/layout/CustomerLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { customerOrders } from "@/data/customerData";
+import { api } from "@/data/api";
 import { format } from "date-fns";
 
 const statusColors: Record<string, string> = {
@@ -12,10 +13,19 @@ const statusColors: Record<string, string> = {
 };
 
 const CustomerOrders = () => {
+  const [customerOrders, setCustomerOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.customer.getOrders().then(setCustomerOrders);
+  }, []);
+
   return (
     <CustomerLayout title="My Orders">
       <div className="space-y-4">
-        {customerOrders.map((order) => (
+        {customerOrders.map((order) => {
+          let items = [];
+          try { items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items; } catch(e) { items = []; }
+          return (
           <Card key={order.id} className="bg-card border-border">
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
@@ -30,25 +40,25 @@ const CustomerOrders = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2 mb-3">
-                {order.items.map((item, idx) => (
+                {items.map((item: any, idx: number) => (
                   <div key={idx} className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {item.name} × {item.qty}
                     </span>
-                    <span className="text-foreground">${(item.price * item.qty).toFixed(2)}</span>
+                    <span className="text-foreground">${(Number(item.price) * Number(item.qty)).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="flex justify-between border-t border-border pt-3">
                 <span className="text-sm font-medium text-foreground">Total</span>
-                <span className="text-sm font-bold text-foreground">${order.total.toFixed(2)}</span>
+                <span className="text-sm font-bold text-foreground">${Number(order.total).toFixed(2)}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Est. delivery: {format(new Date(order.estimatedDelivery), "MMM d, yyyy")}
+                Est. delivery: {format(new Date(order.estimatedDelivery || order.estimated_delivery), "MMM d, yyyy")}
               </p>
             </CardContent>
           </Card>
-        ))}
+        )})}
       </div>
     </CustomerLayout>
   );

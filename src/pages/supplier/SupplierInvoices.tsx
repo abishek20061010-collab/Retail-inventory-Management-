@@ -1,41 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SupplierLayout from "@/components/layout/SupplierLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { invoices as initialInvoices, supplierOrders, type Invoice } from "@/data/supplierData";
+import { api } from "@/data/api";
 import { toast } from "sonner";
 import { FileText, Plus } from "lucide-react";
 
 const SupplierInvoices = () => {
-  const [invList, setInvList] = useState<Invoice[]>(initialInvoices);
+  const [invList, setInvList] = useState<any[]>([]);
+  const [supplierOrders, setSupplierOrders] = useState<any[]>([]);
+
+  const loadData = () => {
+    api.supplier.getInvoices().then(setInvList);
+    api.orders.getAll().then(setSupplierOrders);
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const deliveredWithoutInvoice = supplierOrders.filter(
-    (o) => o.status === "delivered" && !invList.find((i) => i.orderId === o.id)
+    (o) => o.supplier_status === "delivered" && !invList.find((i) => i.orderId === o.id)
   );
 
-  const generateInvoice = (orderId: string) => {
+  const generateInvoice = async (orderId: string) => {
     const order = supplierOrders.find((o) => o.id === orderId);
     if (!order) return;
-    const newInv: Invoice = {
+    const newInv = {
       id: `INV-${String(invList.length + 1).padStart(3, "0")}`,
       orderId,
-      productName: order.productName,
+      productName: order.product_name,
       quantity: order.quantity,
-      unitPrice: order.totalPrice / order.quantity,
-      totalAmount: order.totalPrice,
+      unitPrice: order.unit_price,
+      totalAmount: order.total_price,
       status: "draft",
       createdAt: new Date().toISOString(),
       dueDate: "2026-04-15",
     };
-    setInvList((prev) => [...prev, newInv]);
+    await api.supplier.createInvoice(newInv);
     toast.success(`Invoice ${newInv.id} generated for order ${orderId}`);
+    loadData();
   };
 
-  const sendInvoice = (id: string) => {
-    setInvList((prev) => prev.map((i) => (i.id === id ? { ...i, status: "sent" as const } : i)));
+  const sendInvoice = async (id: string) => {
+    await api.supplier.updateInvoiceStatus(id, "sent");
     toast.success(`Invoice ${id} sent`);
+    loadData();
   };
 
   return (
@@ -51,8 +61,8 @@ const SupplierInvoices = () => {
             {deliveredWithoutInvoice.map((o) => (
               <div key={o.id} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
                 <div>
-                  <p className="text-sm text-foreground">{o.productName}</p>
-                  <p className="text-xs text-muted-foreground">{o.id} · ${o.totalPrice.toFixed(2)}</p>
+                  <p className="text-sm text-foreground">{o.product_name}</p>
+                  <p className="text-xs text-muted-foreground">{o.id} · ${parseFloat(o.total_price).toFixed(2)}</p>
                 </div>
                 <Button size="sm" onClick={() => generateInvoice(o.id)} className="text-xs">
                   <FileText className="h-3.5 w-3.5 mr-1" /> Generate
@@ -87,7 +97,7 @@ const SupplierInvoices = () => {
                   <TableCell className="font-mono text-xs text-muted-foreground">{inv.orderId}</TableCell>
                   <TableCell className="text-foreground">{inv.productName}</TableCell>
                   <TableCell className="text-foreground">{inv.quantity}</TableCell>
-                  <TableCell className="text-foreground">${inv.totalAmount.toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">${parseFloat(inv.totalAmount).toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge variant={inv.status === "paid" ? "default" : inv.status === "sent" ? "secondary" : "outline"} className="text-xs capitalize">
                       {inv.status}

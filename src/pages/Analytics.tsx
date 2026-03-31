@@ -1,9 +1,17 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import StockTrendChart from "@/components/dashboard/StockTrendChart";
-import { products, categoryDistribution } from "@/data/mockData";
+import { categoryDistribution } from "@/data/mockData";
+import { api } from "@/data/api";
 
 const Analytics = () => {
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.inventory.getAll().then(setProducts);
+  }, []);
+
   const stockData = products.map((p) => ({
     name: p.name.length > 15 ? p.name.slice(0, 15) + "…" : p.name,
     stock: p.currentStock,

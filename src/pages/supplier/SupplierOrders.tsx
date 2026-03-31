@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supplierOrders, type SupplierOrder } from "@/data/supplierData";
+import { type SupplierOrder } from "@/data/supplierData";
 import { toast } from "sonner";
+import { fetchOrders, syncStatus } from "@/data/orderManager";
 
 const statusColors: Record<string, string> = {
   new: "bg-warning/10 text-warning border-warning/30",
@@ -25,21 +27,38 @@ const nextStatus: Record<string, SupplierOrder["status"] | null> = {
 };
 
 const SupplierOrders = () => {
-  const [orders, setOrders] = useState<SupplierOrder[]>(supplierOrders);
+  const [orders, setOrders] = useState<any[]>([]);
   const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      const data = await fetchOrders();
+      const formatted = data.map((o: any) => ({
+        id: o.id,
+        productName: o.product_name,
+        sku: o.sku,
+        quantity: o.quantity,
+        totalPrice: Number(o.total_price),
+        status: o.supplier_status,
+        orderedBy: o.ordered_by,
+        orderedAt: o.created_at,
+        estimatedDelivery: new Date(o.estimated_delivery).toISOString().split('T')[0]
+      }));
+      setOrders(formatted);
+    };
+    loadOrders();
+  }, []);
 
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
-  const advanceOrder = (id: string) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id === id && nextStatus[o.status]) {
-          toast.success(`Order ${id} updated to ${nextStatus[o.status]}`);
-          return { ...o, status: nextStatus[o.status]! };
-        }
-        return o;
-      })
-    );
+  const advanceOrder = async (id: string) => {
+    const order = orders.find((o) => o.id === id);
+    if (order && nextStatus[order.status as keyof typeof nextStatus]) {
+      const newStatus = nextStatus[order.status as keyof typeof nextStatus]!;
+      await syncStatus(id, newStatus);
+      toast.success(`Order ${id} updated to ${newStatus}`);
+      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o)));
+    }
   };
 
   return (
@@ -80,7 +99,7 @@ const SupplierOrders = () => {
                   <TableCell className="font-mono text-xs text-foreground">{o.id}</TableCell>
                   <TableCell className="text-foreground">{o.productName}</TableCell>
                   <TableCell className="text-foreground">{o.quantity}</TableCell>
-                  <TableCell className="text-foreground">${o.totalPrice.toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">${Number(o.totalPrice).toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge className={`text-xs capitalize border ${statusColors[o.status]}`}>{o.status}</Badge>
                   </TableCell>

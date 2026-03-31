@@ -1,18 +1,29 @@
 import { Package, AlertTriangle, RefreshCw, Radio } from "lucide-react";
+import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import KpiCard from "@/components/dashboard/KpiCard";
 import StockLevelBar from "@/components/dashboard/StockLevelBar";
 import RecentAlerts from "@/components/dashboard/RecentAlerts";
 import StockTrendChart from "@/components/dashboard/StockTrendChart";
-import { products, alerts, reorderRequests } from "@/data/mockData";
+import { api } from "@/data/api";
 
 const Dashboard = () => {
+  const [products, setProducts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.inventory.getAll().then(setProducts);
+    api.alerts.getAll().then(setAlerts);
+    api.orders.getAll().then(setOrders);
+  }, []);
+
   const totalProducts = products.length;
   const lowStockCount = products.filter((p) => p.currentStock > 0 && p.currentStock <= p.minThreshold).length;
   const outOfStockCount = products.filter((p) => p.currentStock === 0).length;
   const activeRfid = products.filter((p) => p.rfidStatus === "active").length;
-  const pendingReorders = reorderRequests.filter((r) => r.status === "pending" || r.status === "approved").length;
-  const unreadAlerts = alerts.filter((a) => !a.read).length;
+  const pendingReorders = orders.filter((r) => r.manager_status === "pending" || r.manager_status === "approved").length;
+  const unreadAlerts = alerts.filter((a) => !a.is_read).length;
 
   const sortedByStock = [...products].sort(
     (a, b) => a.currentStock / a.maxCapacity - b.currentStock / b.maxCapacity

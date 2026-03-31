@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SupplierLayout from "@/components/layout/SupplierLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
-import { supplierProducts } from "@/data/supplierData";
+import { api } from "@/data/api";
 
 const SupplierProducts = () => {
+  const [supplierProducts, setSupplierProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    api.supplier.getProducts().then(setSupplierProducts);
+  }, []);
 
   const filtered = supplierProducts.filter(
     (p) => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase())
@@ -47,7 +52,7 @@ const SupplierProducts = () => {
                   <TableCell className="font-medium text-foreground">{p.name}</TableCell>
                   <TableCell className="font-mono text-xs text-muted-foreground">{p.sku}</TableCell>
                   <TableCell><Badge variant="secondary" className="text-xs">{p.category}</Badge></TableCell>
-                  <TableCell className="text-foreground">${p.unitPrice.toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">${Number(p.unitPrice).toFixed(2)}</TableCell>
                   <TableCell className={p.stockAvailable < 200 ? "text-warning" : "text-success"}>{p.stockAvailable}</TableCell>
                   <TableCell className="text-muted-foreground">{p.leadTimeDays}d</TableCell>
                 </TableRow>

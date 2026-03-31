@@ -1,6 +1,7 @@
 import { AlertTriangle, AlertCircle, Info, Bell } from "lucide-react";
+import { useState, useEffect } from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import { alerts } from "@/data/mockData";
+import { api } from "@/data/api";
 import { cn } from "@/lib/utils";
 
 const iconMap = { critical: AlertTriangle, warning: AlertCircle, info: Info };
@@ -8,8 +9,14 @@ const colorMap = { critical: "text-critical", warning: "text-warning", info: "te
 const bgMap = { critical: "bg-critical/5 border-critical/20", warning: "bg-warning/5 border-warning/20", info: "bg-primary/5 border-primary/20" };
 
 const Alerts = () => {
-  const unread = alerts.filter((a) => !a.read);
-  const read = alerts.filter((a) => a.read);
+  const [alerts, setAlerts] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.alerts.getAll().then(setAlerts);
+  }, []);
+
+  const unread = alerts.filter((a) => !a.is_read);
+  const read = alerts.filter((a) => a.is_read);
 
   return (
     <AppLayout title="Alerts">

@@ -1,19 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomerLayout from "@/components/layout/CustomerLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { customerProducts } from "@/data/customerData";
+import { api } from "@/data/api";
+import { cartStore } from "@/data/cartStore";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const CustomerCart = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState([
-    { productId: "CP-001", qty: 2 },
-    { productId: "CP-007", qty: 1 },
-  ]);
+  const [customerProducts, setCustomerProducts] = useState<any[]>([]);
+  const [cartItems, setCartItems] = useState(cartStore.getItems());
+
+  useEffect(() => {
+    api.customer.getProducts().then(setCustomerProducts);
+  }, []);
 
   const items = cartItems
     .map((ci) => {
@@ -22,23 +25,43 @@ const CustomerCart = () => {
     })
     .filter(Boolean) as (typeof customerProducts[0] & { qty: number })[];
 
-  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const total = items.reduce((s, i) => s + Number(i.price) * i.qty, 0);
 
   const updateQty = (id: string, delta: number) => {
-    setCartItems((prev) =>
-      prev.map((ci) => (ci.productId === id ? { ...ci, qty: Math.max(1, ci.qty + delta) } : ci))
-    );
+    const updated = cartStore.updateQty(id, delta);
+    setCartItems(updated);
   };
 
   const remove = (id: string) => {
-    setCartItems((prev) => prev.filter((ci) => ci.productId !== id));
+    const updated = cartStore.removeItem(id);
+    setCartItems(updated);
     toast.info("Item removed from cart");
   };
 
-  const placeOrder = () => {
-    toast.success("Order placed successfully!");
-    setCartItems([]);
-    setTimeout(() => navigate("/customer/orders"), 1000);
+  const placeOrder = async () => {
+    if (items.length === 0) return;
+    
+    const delivery = new Date();
+    delivery.setDate(delivery.getDate() + 2);
+
+    const payload = {
+      id: `CO-${Math.floor(Math.random() * 10000).toString().padStart(4, "0")}`,
+      items: items.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+      total,
+      status: "placed",
+      placedAt: new Date().toISOString().split(".")[0].replace("T", " "),
+      estimatedDelivery: delivery.toISOString().split("T")[0],
+    };
+
+    try {
+      await api.customer.placeOrder(payload);
+      toast.success("Order placed successfully!");
+      cartStore.clear();
+      setCartItems([]);
+      setTimeout(() => navigate("/customer/orders"), 1000);
+    } catch (e: any) {
+      toast.error(e.message || "Failed to place order");
+    }
   };
 
   return (
@@ -74,7 +97,7 @@ const CustomerCart = () => {
                   {items.map((item) => (
                     <TableRow key={item.id} className="border-border">
                       <TableCell className="text-foreground font-medium">{item.name}</TableCell>
-                      <TableCell className="text-foreground">${item.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-foreground">${Number(item.price).toFixed(2)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Button size="icon" variant="outline" className="h-7 w-7 border-border" onClick={() => updateQty(item.id, -1)}>
@@ -86,7 +109,7 @@ const CustomerCart = () => {
                           </Button>
                         </div>
                       </TableCell>
-                      <TableCell className="text-foreground font-medium">${(item.price * item.qty).toFixed(2)}</TableCell>
+                      <TableCell className="text-foreground font-medium">${(Number(item.price) * item.qty).toFixed(2)}</TableCell>
                       <TableCell>
                         <Button size="icon" variant="ghost" className="h-7 w-7 text-critical" onClick={() => remove(item.id)}>
                           <Trash2 className="h-3.5 w-3.5" />

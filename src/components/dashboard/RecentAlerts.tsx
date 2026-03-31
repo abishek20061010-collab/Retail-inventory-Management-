@@ -1,6 +1,7 @@
 import { AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { alerts } from "@/data/mockData";
+import { api } from "@/data/api";
 
 const iconMap = {
   critical: AlertTriangle,
@@ -15,6 +16,12 @@ const colorMap = {
 };
 
 const RecentAlerts = () => {
+  const [alerts, setAlerts] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.alerts.getAll().then(setAlerts);
+  }, []);
+
   const recent = alerts.slice(0, 5);
 
   return (

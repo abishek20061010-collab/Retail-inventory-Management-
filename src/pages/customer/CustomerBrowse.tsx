@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomerLayout from "@/components/layout/CustomerLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,15 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, ShoppingCart, Package } from "lucide-react";
-import { customerProducts } from "@/data/customerData";
+import { api } from "@/data/api";
+import { cartStore } from "@/data/cartStore";
 import { toast } from "sonner";
-
-const categories = ["All", ...Array.from(new Set(customerProducts.map((p) => p.category)))];
+import { useNavigate } from "react-router-dom";
 
 const CustomerBrowse = () => {
+  const navigate = useNavigate();
+  const [customerProducts, setCustomerProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [cart, setCart] = useState<Record<string, number>>({});
+  const [cartCount, setCartCount] = useState(cartStore.getCount());
+
+  useEffect(() => {
+    api.customer.getProducts().then(setCustomerProducts);
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(customerProducts.map((p) => p.category)))];
 
   const filtered = customerProducts.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -23,11 +31,10 @@ const CustomerBrowse = () => {
   });
 
   const addToCart = (id: string, name: string) => {
-    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+    cartStore.addItem(id);
+    setCartCount(cartStore.getCount());
     toast.success(`${name} added to cart`);
   };
-
-  const cartCount = Object.values(cart).reduce((s, v) => s + v, 0);
 
   return (
     <CustomerLayout title="Browse Products">
@@ -47,7 +54,10 @@ const CustomerBrowse = () => {
           </SelectContent>
         </Select>
         {cartCount > 0 && (
-          <Badge className="bg-warning text-warning-foreground px-3 py-1">
+          <Badge
+            className="bg-warning text-warning-foreground px-3 py-1 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate("/customer/cart")}
+          >
             <ShoppingCart className="h-3.5 w-3.5 mr-1" /> {cartCount} items
           </Badge>
         )}
@@ -63,7 +73,7 @@ const CustomerBrowse = () => {
               <h3 className="text-sm font-semibold text-foreground mb-1">{p.name}</h3>
               <p className="text-xs text-muted-foreground mb-3">{p.category}</p>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-foreground">${p.price.toFixed(2)}</span>
+                <span className="text-lg font-bold text-foreground">${Number(p.price).toFixed(2)}</span>
                 {p.inStock ? (
                   <Button size="sm" onClick={() => addToCart(p.id, p.name)} className="text-xs bg-gradient-to-r from-warning to-[hsl(25,95%,53%)] text-primary-foreground">
                     Add to Cart

@@ -1,10 +1,17 @@
 import { Bell, Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { alerts } from "@/data/mockData";
+import { api } from "@/data/api";
 
 const Header = ({ title }: { title: string }) => {
-  const unreadCount = alerts.filter((a) => !a.read).length;
+  const [alerts, setAlerts] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.alerts.getAll().then(setAlerts);
+  }, []);
+
+  const unreadCount = alerts.filter((a) => !a.is_read).length;
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-card/50 px-6 backdrop-blur-sm">
