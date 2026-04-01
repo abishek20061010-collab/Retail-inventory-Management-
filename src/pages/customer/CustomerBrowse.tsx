@@ -73,7 +73,7 @@ const CustomerBrowse = () => {
               <h3 className="text-sm font-semibold text-foreground mb-1">{p.name}</h3>
               <p className="text-xs text-muted-foreground mb-3">{p.category}</p>
               <div className="flex items-center justify-between">
-                <span className="text-lg font-bold text-foreground">${Number(p.price).toFixed(2)}</span>
+                <span className="text-lg font-bold text-foreground">₹{Number(p.price).toFixed(2)}</span>
                 {p.inStock ? (
                   <Button size="sm" onClick={() => addToCart(p.id, p.name)} className="text-xs bg-gradient-to-r from-warning to-[hsl(25,95%,53%)] text-primary-foreground">
                     Add to Cart

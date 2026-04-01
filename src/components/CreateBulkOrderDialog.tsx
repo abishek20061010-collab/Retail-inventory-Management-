@@ -85,7 +85,7 @@ export function CreateBulkOrderDialog({ onOrderCreated }: { onOrderCreated: () =
                   <SelectContent>
                     {supplierProducts.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.name} - ${Number(p.unitPrice).toFixed(2)}
+                        {p.name} - ₹{Number(p.unitPrice).toFixed(2)}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -91,7 +91,15 @@ app.put('/api/orders/:id/status', async (req, res) => {
         const { sku, product_name, quantity } = orderRows[0];
         
         // Update manager inventory by SKU (reliable cross-portal link)
-        await db.query('UPDATE inventory_products SET currentStock = currentStock + ? WHERE sku = ?', [quantity, sku]);
+        const today = new Date().toISOString().split('T')[0];
+        const expiry = new Date();
+        expiry.setMonth(expiry.getMonth() + 3);
+        const expiryDate = expiry.toISOString().split('T')[0];
+
+        await db.query(
+          'UPDATE inventory_products SET currentStock = currentStock + ?, manufactureDate = ?, expiryDate = ? WHERE sku = ?', 
+          [quantity, today, expiryDate, sku]
+        );
         
         // Fetch new stock level to sync customer portal and trigger alerts
         const [invRows] = await db.query('SELECT currentStock FROM inventory_products WHERE sku = ?', [sku]);
@@ -112,7 +120,7 @@ app.put('/api/orders/:id/status', async (req, res) => {
 app.get('/api/inventory', (req, res) => executeQuery(res, 'SELECT * FROM inventory_products'));
 
 app.post('/api/inventory', async (req, res) => {
-  const { name, sku, category, rfidTag, shelfLocation, currentStock, minThreshold, maxCapacity, unitPrice, rfidStatus } = req.body;
+  const { name, sku, category, rfidTag, shelfLocation, currentStock, minThreshold, maxCapacity, unitPrice, rfidStatus, manufactureDate, expiryDate } = req.body;
   
   // Generate unique IDs
   const invId = 'INV-' + Date.now();
@@ -123,9 +131,9 @@ app.post('/api/inventory', async (req, res) => {
   try {
     // 1. Insert into inventory_products
     await db.query(
-      `INSERT INTO inventory_products (id, rfidTag, name, sku, category, shelfLocation, currentStock, minThreshold, maxCapacity, lastScanned, rfidStatus, unitPrice)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [invId, rfidTag || 'RFID-' + Math.random().toString(36).substring(2, 8).toUpperCase(), name, sku, category, shelfLocation, currentStock, minThreshold, maxCapacity, now, rfidStatus || 'active', unitPrice]
+      `INSERT INTO inventory_products (id, rfidTag, name, sku, category, shelfLocation, currentStock, minThreshold, maxCapacity, lastScanned, rfidStatus, unitPrice, manufactureDate, expiryDate)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [invId, rfidTag || 'RFID-' + Math.random().toString(36).substring(2, 8).toUpperCase(), name, sku, category, shelfLocation, currentStock, minThreshold, maxCapacity, now, rfidStatus || 'active', unitPrice, manufactureDate || null, expiryDate || null]
     );
 
     // 2. Insert into supplier_products (so supplier sees the product)
@@ -147,22 +155,54 @@ app.post('/api/inventory', async (req, res) => {
 });
 
 app.put('/api/inventory/:id', async (req, res) => {
-  const { currentStock } = req.body;
   const { id } = req.params;
-  const query = `UPDATE inventory_products SET currentStock = ? WHERE id = ?`;
-  try {
-    await db.query(query, [currentStock, id]);
-    
-    // Sync: Update customer portal visibility and check alerts
-    const [invRows] = await db.query('SELECT name FROM inventory_products WHERE id = ?', [id]);
-    if (invRows.length > 0) {
-      await syncStockLevel(invRows[0].name, currentStock);
-    }
+  const { 
+    name, sku, category, rfidTag, shelfLocation, 
+    currentStock, minThreshold, maxCapacity, unitPrice, 
+    rfidStatus, manufactureDate, expiryDate 
+  } = req.body;
 
-    res.json({ message: 'Stock updated' });
+  try {
+    // 1. Get original product to sync changes correctly
+    const [oldRows] = await db.query('SELECT name, sku FROM inventory_products WHERE id = ?', [id]);
+    if (oldRows.length === 0) return res.status(404).json({ error: 'Product not found' });
+    const old = oldRows[0];
+
+    // 2. Update the product in inventory
+    const query = `
+      UPDATE inventory_products 
+      SET name = ?, sku = ?, category = ?, rfidTag = ?, shelfLocation = ?, 
+          currentStock = ?, minThreshold = ?, maxCapacity = ?, unitPrice = ?, 
+          rfidStatus = ?, manufactureDate = ?, expiryDate = ?
+      WHERE id = ?
+    `;
+    await db.query(query, [
+      name, sku, category, rfidTag, shelfLocation, 
+      currentStock, minThreshold, maxCapacity, unitPrice, 
+      rfidStatus, manufactureDate || null, expiryDate || null, 
+      id
+    ]);
+
+    // 3. Sync changes to other tables
+    // Update supplier portal (linked by SKU)
+    await db.query(
+      'UPDATE supplier_products SET name = ?, category = ?, unitPrice = ? WHERE sku = ?',
+      [name, category, unitPrice * 0.7, old.sku]
+    );
+
+    // Update customer portal (linked by name)
+    await db.query(
+      'UPDATE customer_products SET name = ?, category = ?, price = ?, inStock = ? WHERE name = ?',
+      [name, category, unitPrice, currentStock > 0 ? 1 : 0, old.name]
+    );
+
+    // 4. Check for alerts
+    await syncStockLevel(name, currentStock);
+
+    res.json({ message: 'Product updated successfully across all portals' });
   } catch(e) { 
     console.error(e); 
-    res.status(500).json({ error: 'Failed to update inventory stock' }); 
+    res.status(500).json({ error: 'Failed to update inventory product' }); 
   }
 });
 

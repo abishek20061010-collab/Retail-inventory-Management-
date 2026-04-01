@@ -2,16 +2,16 @@ require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 const inventoryProducts = [
-  { id: "1", rfidTag: "RFID-0A1B2C", name: "Organic Whole Milk 1L", sku: "DRY-001", category: "Dairy", shelfLocation: "A1-03", currentStock: 45, minThreshold: 20, maxCapacity: 100, lastScanned: "2026-03-31T10:23:00", rfidStatus: "active", unitPrice: 3.49 },
-  { id: "2", rfidTag: "RFID-3D4E5F", name: "Sourdough Bread Loaf", sku: "BKR-012", category: "Bakery", shelfLocation: "B2-01", currentStock: 8, minThreshold: 15, maxCapacity: 50, lastScanned: "2026-03-31T10:21:00", rfidStatus: "active", unitPrice: 4.99 },
-  { id: "3", rfidTag: "RFID-6G7H8I", name: "Free Range Eggs 12pk", sku: "DRY-045", category: "Dairy", shelfLocation: "A1-07", currentStock: 62, minThreshold: 25, maxCapacity: 80, lastScanned: "2026-03-31T10:20:00", rfidStatus: "active", unitPrice: 5.29 },
-  { id: "4", rfidTag: "RFID-9J0K1L", name: "Avocado Hass (each)", sku: "PRD-089", category: "Produce", shelfLocation: "C3-02", currentStock: 3, minThreshold: 20, maxCapacity: 60, lastScanned: "2026-03-31T10:18:00", rfidStatus: "active", unitPrice: 1.99 },
-  { id: "5", rfidTag: "RFID-2M3N4O", name: "Sparkling Water 500ml", sku: "BEV-023", category: "Beverages", shelfLocation: "D1-05", currentStock: 120, minThreshold: 30, maxCapacity: 200, lastScanned: "2026-03-31T10:15:00", rfidStatus: "active", unitPrice: 1.29 },
-  { id: "6", rfidTag: "RFID-5P6Q7R", name: "Greek Yogurt 500g", sku: "DRY-067", category: "Dairy", shelfLocation: "A2-01", currentStock: 0, minThreshold: 15, maxCapacity: 40, lastScanned: "2026-03-31T09:45:00", rfidStatus: "error", unitPrice: 4.49 },
-  { id: "7", rfidTag: "RFID-8S9T0U", name: "Chicken Breast 500g", sku: "MEA-034", category: "Meat", shelfLocation: "E1-02", currentStock: 18, minThreshold: 10, maxCapacity: 30, lastScanned: "2026-03-31T10:22:00", rfidStatus: "active", unitPrice: 8.99 },
-  { id: "8", rfidTag: "RFID-1V2W3X", name: "Basmati Rice 1kg", sku: "GRN-011", category: "Grains", shelfLocation: "F2-04", currentStock: 55, minThreshold: 20, maxCapacity: 80, lastScanned: "2026-03-31T10:10:00", rfidStatus: "active", unitPrice: 3.99 },
-  { id: "9", rfidTag: "RFID-4Y5Z6A", name: "Olive Oil Extra Virgin 750ml", sku: "OIL-002", category: "Oils", shelfLocation: "F3-01", currentStock: 12, minThreshold: 10, maxCapacity: 35, lastScanned: "2026-03-31T10:05:00", rfidStatus: "inactive", unitPrice: 9.49 },
-  { id: "10", rfidTag: "RFID-7B8C9D", name: "Almond Butter 250g", sku: "SPR-008", category: "Spreads", shelfLocation: "G1-03", currentStock: 28, minThreshold: 8, maxCapacity: 40, lastScanned: "2026-03-31T10:19:00", rfidStatus: "active", unitPrice: 6.99 }
+  { id: "1", rfidTag: "RFID-0A1B2C", name: "Organic Whole Milk 1L", sku: "DRY-001", category: "Dairy", shelfLocation: "A1-03", currentStock: 45, minThreshold: 20, maxCapacity: 100, lastScanned: "2026-03-31T10:23:00", rfidStatus: "active", unitPrice: 3.49, manufactureDate: "2026-03-01", expiryDate: "2026-04-15" },
+  { id: "2", rfidTag: "RFID-3D4E5F", name: "Sourdough Bread Loaf", sku: "BKR-012", category: "Bakery", shelfLocation: "B2-01", currentStock: 8, minThreshold: 15, maxCapacity: 50, lastScanned: "2026-03-31T10:21:00", rfidStatus: "active", unitPrice: 4.99, manufactureDate: "2026-03-25", expiryDate: "2026-04-05" },
+  { id: "3", rfidTag: "RFID-6G7H8I", name: "Free Range Eggs 12pk", sku: "DRY-045", category: "Dairy", shelfLocation: "A1-07", currentStock: 62, minThreshold: 25, maxCapacity: 80, lastScanned: "2026-03-31T10:20:00", rfidStatus: "active", unitPrice: 5.29, manufactureDate: "2026-03-10", expiryDate: "2026-04-20" },
+  { id: "4", rfidTag: "RFID-9J0K1L", name: "Avocado Hass (each)", sku: "PRD-089", category: "Produce", shelfLocation: "C3-02", currentStock: 3, minThreshold: 20, maxCapacity: 60, lastScanned: "2026-03-31T10:18:00", rfidStatus: "active", unitPrice: 1.99, manufactureDate: "2026-03-20", expiryDate: "2026-04-10" },
+  { id: "5", rfidTag: "RFID-2M3N4O", name: "Sparkling Water 500ml", sku: "BEV-023", category: "Beverages", shelfLocation: "D1-05", currentStock: 120, minThreshold: 30, maxCapacity: 200, lastScanned: "2026-03-31T10:15:00", rfidStatus: "active", unitPrice: 1.29, manufactureDate: "2026-02-15", expiryDate: "2026-05-15" },
+  { id: "6", rfidTag: "RFID-5P6Q7R", name: "Greek Yogurt 500g", sku: "DRY-067", category: "Dairy", shelfLocation: "A2-01", currentStock: 0, minThreshold: 15, maxCapacity: 40, lastScanned: "2026-03-31T09:45:00", rfidStatus: "error", unitPrice: 4.49, manufactureDate: "2026-03-05", expiryDate: "2026-03-25" },
+  { id: "7", rfidTag: "RFID-8S9T0U", name: "Chicken Breast 500g", sku: "MEA-034", category: "Meat", shelfLocation: "E1-02", currentStock: 18, minThreshold: 10, maxCapacity: 30, lastScanned: "2026-03-31T10:22:00", rfidStatus: "active", unitPrice: 8.99, manufactureDate: "2026-03-15", expiryDate: "2026-04-05" },
+  { id: "8", rfidTag: "RFID-1V2W3X", name: "Basmati Rice 1kg", sku: "GRN-011", category: "Grains", shelfLocation: "F2-04", currentStock: 55, minThreshold: 20, maxCapacity: 80, lastScanned: "2026-03-31T10:10:00", rfidStatus: "active", unitPrice: 3.99, manufactureDate: "2026-01-15", expiryDate: "2026-06-15" },
+  { id: "9", rfidTag: "RFID-4Y5Z6A", name: "Olive Oil Extra Virgin 750ml", sku: "OIL-002", category: "Oils", shelfLocation: "F3-01", currentStock: 12, minThreshold: 10, maxCapacity: 35, lastScanned: "2026-03-31T10:05:00", rfidStatus: "inactive", unitPrice: 9.49, manufactureDate: "2025-12-01", expiryDate: "2026-06-01" },
+  { id: "10", rfidTag: "RFID-7B8C9D", name: "Almond Butter 250g", sku: "SPR-008", category: "Spreads", shelfLocation: "G1-03", currentStock: 28, minThreshold: 8, maxCapacity: 40, lastScanned: "2026-03-31T10:19:00", rfidStatus: "active", unitPrice: 6.99, manufactureDate: "2026-02-01", expiryDate: "2026-05-01" }
 ];
 
 const alerts = [
@@ -118,7 +118,8 @@ async function setup() {
       CREATE TABLE inventory_products (
         id VARCHAR(50) PRIMARY KEY, rfidTag VARCHAR(100), name VARCHAR(100), sku VARCHAR(50), category VARCHAR(50),
         shelfLocation VARCHAR(50), currentStock INT, minThreshold INT, maxCapacity INT,
-        lastScanned DATETIME, rfidStatus VARCHAR(50), unitPrice DECIMAL(10,2)
+        lastScanned DATETIME, rfidStatus VARCHAR(50), unitPrice DECIMAL(10,2),
+        manufactureDate DATE, expiryDate DATE
       )
     `);
 
@@ -172,8 +173,8 @@ async function setup() {
     for (const o of initialBulkOrders) await connection.query('INSERT INTO orders VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
       [o.id, o.productId, o.productName, o.sku, o.quantity, o.unitPrice, o.totalPrice, o.supplierStatus, o.managerStatus, o.orderedBy, o.supplierName, o.createdAt, o.estimatedDelivery]);
 
-    for (const p of inventoryProducts) await connection.query('INSERT INTO inventory_products VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-      [p.id, p.rfidTag, p.name, p.sku, p.category, p.shelfLocation, p.currentStock, p.minThreshold, p.maxCapacity, p.lastScanned, p.rfidStatus, p.unitPrice]);
+    for (const p of inventoryProducts) await connection.query('INSERT INTO inventory_products VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [p.id, p.rfidTag, p.name, p.sku, p.category, p.shelfLocation, p.currentStock, p.minThreshold, p.maxCapacity, p.lastScanned, p.rfidStatus, p.unitPrice, p.manufactureDate, p.expiryDate]);
 
     for (const a of alerts) await connection.query('INSERT INTO alerts VALUES (?,?,?,?,?,?)',
       [a.id, a.type, a.message, a.productName, a.timestamp, a.read]);

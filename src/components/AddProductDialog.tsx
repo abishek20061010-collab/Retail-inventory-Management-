@@ -38,11 +38,14 @@ export function AddProductDialog({ onProductAdded }: { onProductAdded: () => voi
   const [maxCapacity, setMaxCapacity] = useState("100");
   const [unitPrice, setUnitPrice] = useState("");
   const [rfidStatus, setRfidStatus] = useState("active");
+  const [manufactureDate, setManufactureDate] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
 
   const resetForm = () => {
     setName(""); setSku(""); setCategory(""); setRfidTag("");
     setShelfLocation(""); setCurrentStock("0"); setMinThreshold("10");
     setMaxCapacity("100"); setUnitPrice(""); setRfidStatus("active");
+    setManufactureDate(""); setExpiryDate("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,6 +68,8 @@ export function AddProductDialog({ onProductAdded }: { onProductAdded: () => voi
         maxCapacity: parseInt(maxCapacity, 10) || 100,
         unitPrice: parseFloat(unitPrice) || 0,
         rfidStatus,
+        manufactureDate: manufactureDate || undefined,
+        expiryDate: expiryDate || undefined,
       });
 
       toast.success(`${name} added to inventory and synced across all portals.`);
@@ -165,11 +170,19 @@ export function AddProductDialog({ onProductAdded }: { onProductAdded: () => voi
               </div>
             </div>
 
-            {/* Row 5: Unit Price */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Row 5: Unit Price & Dates */}
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="prod-price">Unit Price ($) *</Label>
+                <Label htmlFor="prod-price">Unit Price (₹) *</Label>
                 <Input id="prod-price" type="number" step="0.01" min="0.01" placeholder="e.g. 3.49" value={unitPrice} onChange={(e) => setUnitPrice(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="prod-mfg">MFG Date</Label>
+                <Input id="prod-mfg" type="date" value={manufactureDate} onChange={(e) => setManufactureDate(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="prod-exp">EXP Date</Label>
+                <Input id="prod-exp" type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
               </div>
             </div>
           </div>

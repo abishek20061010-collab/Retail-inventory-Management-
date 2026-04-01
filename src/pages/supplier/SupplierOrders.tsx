@@ -56,7 +56,10 @@ const SupplierOrders = () => {
     if (order && nextStatus[order.status as keyof typeof nextStatus]) {
       const newStatus = nextStatus[order.status as keyof typeof nextStatus]!;
       await syncStatus(id, newStatus);
-      toast.success(`Order ${id} updated to ${newStatus}`);
+      const msg = newStatus === "delivered" 
+        ? `Order ${id} delivered. MFG/EXP dates generated automatically.`
+        : `Order ${id} updated to ${newStatus}`;
+      toast.success(msg);
       setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o)));
     }
   };
@@ -99,7 +102,7 @@ const SupplierOrders = () => {
                   <TableCell className="font-mono text-xs text-foreground">{o.id}</TableCell>
                   <TableCell className="text-foreground">{o.productName}</TableCell>
                   <TableCell className="text-foreground">{o.quantity}</TableCell>
-                  <TableCell className="text-foreground">${Number(o.totalPrice).toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">₹{Number(o.totalPrice).toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge className={`text-xs capitalize border ${statusColors[o.status]}`}>{o.status}</Badge>
                   </TableCell>

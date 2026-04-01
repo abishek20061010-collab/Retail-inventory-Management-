@@ -24,7 +24,7 @@ const SupplierDashboard = () => {
     { label: "Total Products", value: supplierProducts.length, icon: Package, color: "text-primary" },
     { label: "New Orders", value: newOrders, icon: ClipboardList, color: "text-warning" },
     { label: "Active Orders", value: activeOrders, icon: ClipboardList, color: "text-success" },
-    { label: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-primary" },
+    { label: "Total Revenue", value: `₹${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-primary" },
   ];
 
   return (
@@ -72,7 +72,7 @@ const SupplierDashboard = () => {
               <div key={inv.id} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">{inv.id}</p>
-                  <p className="text-xs text-muted-foreground">{inv.productName} · ${parseFloat(inv.totalAmount).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{inv.productName} · ₹{parseFloat(inv.totalAmount).toFixed(2)}</p>
                 </div>
                 <Badge variant={inv.status === "paid" ? "default" : "secondary"} className="text-xs capitalize">
                   {inv.status}

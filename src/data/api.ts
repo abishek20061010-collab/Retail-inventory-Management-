@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = `http://${window.location.hostname}:5000/api`;
 
 export const api = {
   orders: {
@@ -13,11 +13,16 @@ export const api = {
       const res = await fetch(`${API_BASE}/inventory`);
       return await res.json();
     },
-    updateStock: async (id: string, currentStock: number) => {
+    update: async (id: string, data: {
+      name: string; sku: string; category: string; rfidTag?: string;
+      shelfLocation: string; currentStock: number; minThreshold: number;
+      maxCapacity: number; unitPrice: number; rfidStatus?: string;
+      manufactureDate?: string; expiryDate?: string;
+    }) => {
       const res = await fetch(`${API_BASE}/inventory/${id}`, { 
         method: "PUT", 
         headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ currentStock }) 
+        body: JSON.stringify(data) 
       });
       return await res.json();
     },
@@ -25,6 +30,7 @@ export const api = {
       name: string; sku: string; category: string; rfidTag?: string;
       shelfLocation: string; currentStock: number; minThreshold: number;
       maxCapacity: number; unitPrice: number; rfidStatus?: string;
+      manufactureDate?: string; expiryDate?: string;
     }) => {
       const res = await fetch(`${API_BASE}/inventory`, {
         method: "POST",

@@ -45,13 +45,13 @@ const CustomerOrders = () => {
                     <span className="text-muted-foreground">
                       {item.name} × {item.qty}
                     </span>
-                    <span className="text-foreground">${(Number(item.price) * Number(item.qty)).toFixed(2)}</span>
+                    <span className="text-foreground">₹{(Number(item.price) * Number(item.qty)).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="flex justify-between border-t border-border pt-3">
                 <span className="text-sm font-medium text-foreground">Total</span>
-                <span className="text-sm font-bold text-foreground">${Number(order.total).toFixed(2)}</span>
+                <span className="text-sm font-bold text-foreground">₹{Number(order.total).toFixed(2)}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
                 Est. delivery: {format(new Date(order.estimatedDelivery || order.estimated_delivery), "MMM d, yyyy")}

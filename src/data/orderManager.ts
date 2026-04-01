@@ -2,7 +2,7 @@ import { type SupplierOrder } from "./supplierData";
 import { type ReorderRequest } from "./mockData";
 import { toast } from "sonner";
 
-const API_BASE = "http://localhost:5000/api/orders";
+const API_BASE = `http://${window.location.hostname}:5000/api/orders`;
 
 const formatDate = (date: Date) => {
   return date.toISOString().split(".")[0];

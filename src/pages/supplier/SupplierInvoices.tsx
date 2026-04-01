@@ -62,7 +62,7 @@ const SupplierInvoices = () => {
               <div key={o.id} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
                 <div>
                   <p className="text-sm text-foreground">{o.product_name}</p>
-                  <p className="text-xs text-muted-foreground">{o.id} · ${parseFloat(o.total_price).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{o.id} · ₹{parseFloat(o.total_price).toFixed(2)}</p>
                 </div>
                 <Button size="sm" onClick={() => generateInvoice(o.id)} className="text-xs">
                   <FileText className="h-3.5 w-3.5 mr-1" /> Generate
@@ -97,7 +97,7 @@ const SupplierInvoices = () => {
                   <TableCell className="font-mono text-xs text-muted-foreground">{inv.orderId}</TableCell>
                   <TableCell className="text-foreground">{inv.productName}</TableCell>
                   <TableCell className="text-foreground">{inv.quantity}</TableCell>
-                  <TableCell className="text-foreground">${parseFloat(inv.totalAmount).toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">₹{parseFloat(inv.totalAmount).toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge variant={inv.status === "paid" ? "default" : inv.status === "sent" ? "secondary" : "outline"} className="text-xs capitalize">
                       {inv.status}

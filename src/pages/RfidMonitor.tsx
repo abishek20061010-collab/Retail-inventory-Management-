@@ -4,6 +4,7 @@ import { Radio, Wifi, WifiOff, AlertTriangle, Activity } from "lucide-react";
 import AppLayout from "@/components/layout/AppLayout";
 import { api } from "@/data/api";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 const RfidMonitor = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -149,6 +150,24 @@ const RfidMonitor = () => {
                                     )} />
                                   </div>
                                   <p className="mt-2 text-sm font-black text-foreground leading-snug">{product.name}</p>
+                                  
+                                  <div className="mt-2 grid grid-cols-2 gap-2 border-t border-border/20 pt-2">
+                                    <div className="space-y-0.5">
+                                      <p className="text-[8px] uppercase font-bold text-muted-foreground tracking-tighter">Mfg Date</p>
+                                      <p className="text-[10px] font-mono font-bold text-foreground">
+                                        {product.manufactureDate ? format(new Date(product.manufactureDate), "dd MMM yyyy") : "---"}
+                                      </p>
+                                    </div>
+                                    <div className="space-y-0.5 text-right">
+                                      <p className="text-[8px] uppercase font-bold text-muted-foreground tracking-tighter">Exp Date</p>
+                                      <p className={cn(
+                                        "text-[10px] font-mono font-bold",
+                                        product.expiryDate && new Date(product.expiryDate) < new Date() ? "text-critical" : "text-foreground"
+                                      )}>
+                                        {product.expiryDate ? format(new Date(product.expiryDate), "dd MMM yyyy") : "---"}
+                                      </p>
+                                    </div>
+                                  </div>
                                   <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground border-t border-border/30 pt-2">
                                     <span className="bg-primary/10 px-2 py-0.5 rounded-full text-primary font-black uppercase tracking-tighter shadow-sm">{product.shelfLocation}</span>
                                     <span className="font-mono font-bold">

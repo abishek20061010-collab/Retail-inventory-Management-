@@ -52,7 +52,7 @@ const SupplierProducts = () => {
                   <TableCell className="font-medium text-foreground">{p.name}</TableCell>
                   <TableCell className="font-mono text-xs text-muted-foreground">{p.sku}</TableCell>
                   <TableCell><Badge variant="secondary" className="text-xs">{p.category}</Badge></TableCell>
-                  <TableCell className="text-foreground">${Number(p.unitPrice).toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">₹{Number(p.unitPrice).toFixed(2)}</TableCell>
                   <TableCell className={p.stockAvailable < 200 ? "text-warning" : "text-success"}>{p.stockAvailable}</TableCell>
                   <TableCell className="text-muted-foreground">{p.leadTimeDays}d</TableCell>
                 </TableRow>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { api } from "@/data/api";
 import { cn } from "@/lib/utils";
 import { AddProductDialog } from "@/components/AddProductDialog";
+import { EditProductDialog } from "@/components/EditProductDialog";
 import { toast } from "sonner";
 import {
   Table,
@@ -193,7 +194,8 @@ const Inventory = () => {
                         <TableCell className="text-[10px] text-muted-foreground whitespace-nowrap">
                           {product.lastScanned ? new Date(product.lastScanned).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "---"}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right flex items-center justify-end gap-1">
+                          <EditProductDialog product={product} onProductUpdated={loadProducts} />
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button 
