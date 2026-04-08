@@ -10,7 +10,21 @@ export default async function handler(req, res) {
       .order('created_at', { ascending: false });
 
     if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
+    return res.status(200).json(data.map(item => ({
+      id: item.id,
+      productId: item.product_id,
+      productName: item.product_name,
+      sku: item.sku,
+      quantity: item.quantity,
+      unitPrice: item.unit_price,
+      totalPrice: item.total_price,
+      supplierStatus: item.supplier_status,
+      managerStatus: item.manager_status,
+      orderedBy: item.ordered_by,
+      supplierName: item.supplier_name,
+      createdAt: item.created_at,
+      estimatedDelivery: item.estimated_delivery
+    })));
   }
 
   if (method === 'POST') {

@@ -9,12 +9,26 @@ export default async function handler(req, res) {
     if (path === 'products') {
       const { data, error } = await supabase.from('customer_products').select('*');
       if (error) return res.status(500).json({ error: error.message });
-      return res.status(200).json(data);
+      return res.status(200).json(data.map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        price: item.price,
+        inStock: item.in_stock,
+        image: item.image
+      })));
     }
     if (path === 'orders') {
       const { data, error } = await supabase.from('customer_orders').select('*').order('placed_at', { ascending: false });
       if (error) return res.status(500).json({ error: error.message });
-      return res.status(200).json(data);
+      return res.status(200).json(data.map(item => ({
+        id: item.id,
+        items: item.items,
+        total: item.total,
+        status: item.status,
+        placedAt: item.placed_at,
+        estimatedDelivery: item.estimated_delivery
+      })));
     }
   }
 

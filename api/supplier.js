@@ -8,12 +8,30 @@ export default async function handler(req, res) {
     if (path === 'products') {
       const { data, error } = await supabase.from('supplier_products').select('*');
       if (error) return res.status(500).json({ error: error.message });
-      return res.status(200).json(data);
+      return res.status(200).json(data.map(item => ({
+        id: item.id,
+        name: item.name,
+        sku: item.sku,
+        category: item.category,
+        unitPrice: item.unit_price,
+        stockAvailable: item.stock_available,
+        leadTimeDays: item.lead_time_days
+      })));
     }
     if (path === 'invoices') {
       const { data, error } = await supabase.from('invoices').select('*').order('created_at', { ascending: false });
       if (error) return res.status(500).json({ error: error.message });
-      return res.status(200).json(data);
+      return res.status(200).json(data.map(item => ({
+        id: item.id,
+        orderId: item.order_id,
+        productName: item.product_name,
+        quantity: item.quantity,
+        unitPrice: item.unit_price,
+        totalAmount: item.total_amount,
+        status: item.status,
+        createdAt: item.created_at,
+        dueDate: item.due_date
+      })));
     }
   }
 

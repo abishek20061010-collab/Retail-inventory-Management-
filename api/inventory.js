@@ -5,13 +5,30 @@ export default async function handler(req, res) {
   const { method } = req;
   const { id } = req.query; // For PUT and DELETE
 
+  const mapToCamel = (item) => ({
+    id: item.id,
+    rfidTag: item.rfid_tag,
+    name: item.name,
+    sku: item.sku,
+    category: item.category,
+    shelfLocation: item.shelf_location,
+    currentStock: item.current_stock,
+    minThreshold: item.min_threshold,
+    maxCapacity: item.max_capacity,
+    lastScanned: item.last_scanned,
+    rfidStatus: item.rfid_status,
+    unitPrice: item.unit_price,
+    manufactureDate: item.manufacture_date,
+    expiryDate: item.expiry_date
+  });
+
   if (method === 'GET') {
     const { data, error } = await supabase
       .from('inventory_products')
       .select('*');
 
     if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
+    return res.status(200).json(data.map(mapToCamel));
   }
 
   if (method === 'POST') {
