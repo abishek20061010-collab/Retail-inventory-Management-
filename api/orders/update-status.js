@@ -7,24 +7,24 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  const { id, supplier_status } = req.body;
+  const { id, supplierStatus } = req.body;
   let manager_status = 'pending';
-  if (supplier_status === "new") manager_status = "pending";
-  if (supplier_status === "accepted") manager_status = "approved";
-  if (supplier_status === "processing") manager_status = "approved";
-  if (supplier_status === "shipped") manager_status = "shipped";
-  if (supplier_status === "delivered") manager_status = "delivered";
+  if (supplierStatus === "new") manager_status = "pending";
+  if (supplierStatus === "accepted") manager_status = "approved";
+  if (supplierStatus === "processing") manager_status = "approved";
+  if (supplierStatus === "shipped") manager_status = "shipped";
+  if (supplierStatus === "delivered") manager_status = "delivered";
 
   try {
     // 1. Update order status
     const { error: updateErr } = await supabase
       .from('orders')
-      .update({ supplier_status, manager_status })
+      .update({ supplier_status: supplierStatus, manager_status })
       .eq('id', id);
     if (updateErr) throw updateErr;
 
     // 2. Auto-sync if delivered
-    if (supplier_status === "delivered") {
+    if (supplierStatus === "delivered") {
       const { data: order, error: fetchErr } = await supabase
         .from('orders')
         .select('sku, product_name, quantity')

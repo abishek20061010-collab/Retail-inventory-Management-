@@ -35,18 +35,18 @@ export const placeBulkOrder = async (
 
   const newOrder = {
     id: orderId,
-    product_id: productId,
-    product_name: productName,
+    productId: productId,
+    productName: productName,
     sku,
     quantity,
-    unit_price: unitPrice,
-    total_price: quantity * unitPrice,
-    supplier_status: "new",
-    manager_status: "pending",
-    ordered_by: "Store Manager",
-    supplier_name: "Default Supplier (Bulk)",
-    created_at: formatDate(now),
-    estimated_delivery: deliveryDate.toISOString().split("T")[0]
+    unitPrice: unitPrice,
+    totalPrice: quantity * unitPrice,
+    supplierStatus: "new",
+    managerStatus: "pending",
+    orderedBy: "Store Manager",
+    supplierName: "Default Supplier (Bulk)",
+    createdAt: formatDate(now),
+    estimatedDelivery: deliveryDate.toISOString().split("T")[0]
   };
 
   try {

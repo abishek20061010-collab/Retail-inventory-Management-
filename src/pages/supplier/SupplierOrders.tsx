@@ -33,18 +33,7 @@ const SupplierOrders = () => {
   useEffect(() => {
     const loadOrders = async () => {
       const data = await fetchOrders();
-      const formatted = data.map((o: any) => ({
-        id: o.id,
-        productName: o.product_name,
-        sku: o.sku,
-        quantity: o.quantity,
-        totalPrice: Number(o.total_price),
-        status: o.supplier_status,
-        orderedBy: o.ordered_by,
-        orderedAt: o.created_at,
-        estimatedDelivery: new Date(o.estimated_delivery).toISOString().split('T')[0]
-      }));
-      setOrders(formatted);
+      setOrders(data);
     };
     loadOrders();
   }, []);

@@ -29,17 +29,27 @@ export default async function handler(req, res) {
 
   if (method === 'POST') {
     const { 
-      id, product_id, product_name, sku, quantity, unit_price, 
-      total_price, supplier_status, manager_status, ordered_by, 
-      supplier_name, created_at, estimated_delivery 
+      id, productId, productName, sku, quantity, unitPrice, 
+      totalPrice, supplierStatus, managerStatus, orderedBy, 
+      supplierName, createdAt, estimatedDelivery 
     } = req.body;
 
     const { error } = await supabase
       .from('orders')
       .insert([{
-        id, product_id, product_name, sku, quantity, unit_price, 
-        total_price, supplier_status, manager_status, ordered_by, 
-        supplier_name, created_at, estimated_delivery
+        id, 
+        product_id: productId, 
+        product_name: productName, 
+        sku, 
+        quantity, 
+        unit_price: unitPrice, 
+        total_price: totalPrice, 
+        supplier_status: supplierStatus, 
+        manager_status: managerStatus, 
+        ordered_by: orderedBy, 
+        supplier_name: supplierName, 
+        created_at: createdAt, 
+        estimated_delivery: estimatedDelivery
       }]);
 
     if (error) return res.status(500).json({ error: error.message });

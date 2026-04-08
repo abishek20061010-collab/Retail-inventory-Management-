@@ -15,8 +15,8 @@ const SupplierDashboard = () => {
     api.orders.getAll().then(setSupplierOrders);
     api.supplier.getInvoices().then(setInvoices);
   }, []);
-  const newOrders = supplierOrders.filter((o) => o.supplier_status === "new").length;
-  const activeOrders = supplierOrders.filter((o) => ["accepted", "processing", "shipped"].includes(o.supplier_status)).length;
+  const newOrders = supplierOrders.filter((o) => o.supplierStatus === "new").length;
+  const activeOrders = supplierOrders.filter((o) => ["accepted", "processing", "shipped"].includes(o.supplierStatus)).length;
   const totalRevenue = invoices.reduce((s, i) => s + parseFloat(i.totalAmount), 0);
   const unpaidInvoices = invoices.filter((i) => i.status !== "paid").length;
 
@@ -52,11 +52,11 @@ const SupplierDashboard = () => {
             {supplierOrders.slice(0, 4).map((order) => (
               <div key={order.id} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
                 <div>
-                  <p className="text-sm font-medium text-foreground">{order.product_name}</p>
+                  <p className="text-sm font-medium text-foreground">{order.productName}</p>
                   <p className="text-xs text-muted-foreground">{order.id} · Qty: {order.quantity}</p>
                 </div>
-                <Badge variant={order.supplier_status === "new" ? "destructive" : order.supplier_status === "delivered" ? "default" : "secondary"} className="text-xs capitalize">
-                  {order.supplier_status}
+                <Badge variant={order.supplierStatus === "new" ? "destructive" : order.supplierStatus === "delivered" ? "default" : "secondary"} className="text-xs capitalize">
+                  {order.supplierStatus}
                 </Badge>
               </div>
             ))}

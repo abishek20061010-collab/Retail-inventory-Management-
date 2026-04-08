@@ -17,18 +17,7 @@ const Reorders = () => {
   
   const loadOrders = async () => {
     const data = await fetchOrders();
-    const formatted = data.map((o: any) => ({
-      id: o.id,
-      productId: o.product_id,
-      productName: o.product_name,
-      sku: o.sku,
-      quantity: o.quantity,
-      status: o.manager_status,
-      createdAt: o.created_at,
-      estimatedDelivery: new Date(o.estimated_delivery).toISOString().split('T')[0],
-      supplier: o.supplier_name
-    }));
-    setOrders(formatted);
+    setOrders(data);
   };
 
   useEffect(() => {
