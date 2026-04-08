@@ -65,7 +65,7 @@ export const syncStatus = async (orderId: string, supplierStatus: SupplierOrder[
     await fetch(`${API_BASE}/update-status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: orderId, supplier_status: supplierStatus }),
+      body: JSON.stringify({ id: orderId, supplierStatus: supplierStatus }),
     });
   } catch (err) {
     console.error("Failed to update status on server", err);
