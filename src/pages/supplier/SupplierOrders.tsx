@@ -38,18 +38,18 @@ const SupplierOrders = () => {
     loadOrders();
   }, []);
 
-  const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+  const filtered = filter === "all" ? orders : orders.filter((o) => o.supplierStatus === filter);
 
   const advanceOrder = async (id: string) => {
     const order = orders.find((o) => o.id === id);
-    if (order && nextStatus[order.status as keyof typeof nextStatus]) {
-      const newStatus = nextStatus[order.status as keyof typeof nextStatus]!;
+    if (order && nextStatus[order.supplierStatus as keyof typeof nextStatus]) {
+      const newStatus = nextStatus[order.supplierStatus as keyof typeof nextStatus]!;
       await syncStatus(id, newStatus);
       const msg = newStatus === "delivered" 
         ? `Order ${id} delivered. MFG/EXP dates generated automatically.`
         : `Order ${id} updated to ${newStatus}`;
       toast.success(msg);
-      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: newStatus } : o)));
+      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, supplierStatus: newStatus } : o)));
     }
   };
 
@@ -86,20 +86,20 @@ const SupplierOrders = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((o) => (
+               {filtered.map((o) => (
                 <TableRow key={o.id} className="border-border">
                   <TableCell className="font-mono text-xs text-foreground">{o.id}</TableCell>
                   <TableCell className="text-foreground">{o.productName}</TableCell>
                   <TableCell className="text-foreground">{o.quantity}</TableCell>
                   <TableCell className="text-foreground">₹{Number(o.totalPrice).toFixed(2)}</TableCell>
                   <TableCell>
-                    <Badge className={`text-xs capitalize border ${statusColors[o.status]}`}>{o.status}</Badge>
+                    <Badge className={`text-xs capitalize border ${statusColors[o.supplierStatus]}`}>{o.supplierStatus}</Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{o.estimatedDelivery}</TableCell>
                   <TableCell>
-                    {nextStatus[o.status] ? (
+                    {nextStatus[o.supplierStatus] ? (
                       <Button size="sm" variant="outline" className="text-xs border-border" onClick={() => advanceOrder(o.id)}>
-                        Mark {nextStatus[o.status]}
+                        Mark {nextStatus[o.supplierStatus]}
                       </Button>
                     ) : (
                       <span className="text-xs text-muted-foreground">Complete</span>

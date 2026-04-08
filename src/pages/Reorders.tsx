@@ -38,7 +38,7 @@ const Reorders = () => {
         <div className="flex items-center gap-4">
           {(["pending", "approved", "shipped", "delivered"] as const).map((status) => {
             const config = statusConfig[status];
-            const count = orders.filter((r) => r.status === status).length;
+            const count = orders.filter((r) => r.managerStatus === status).length;
             return (
               <div key={status} className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2">
                 <span className="text-sm font-medium text-foreground">{count}</span>
@@ -62,7 +62,7 @@ const Reorders = () => {
             </thead>
             <tbody>
               {orders.map((order) => {
-                const config = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pending;
+                const config = statusConfig[order.managerStatus as keyof typeof statusConfig] || statusConfig.pending;
                 return (
                   <tr key={order.id} className="border-b border-border last:border-0 hover:bg-secondary/30 transition-colors">
                     <td className="px-4 py-3 font-mono text-sm font-medium text-primary">{order.id}</td>
