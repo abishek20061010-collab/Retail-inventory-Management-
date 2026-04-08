@@ -1,5 +1,5 @@
-import { supabase } from './lib/supabase';
-import { syncStockLevel } from './lib/sync';
+import { supabase } from './lib/supabase.js';
+import { syncStockLevel } from './lib/sync.js';
 
 export default async function handler(req, res) {
   const { method } = req;
