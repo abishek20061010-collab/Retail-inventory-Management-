@@ -2,7 +2,7 @@ import { type SupplierOrder } from "./supplierData";
 import { type ReorderRequest } from "./mockData";
 import { toast } from "sonner";
 
-const API_BASE = `http://${window.location.hostname}:5000/api/orders`;
+const API_BASE = `/api/orders`;
 
 const formatDate = (date: Date) => {
   return date.toISOString().split(".")[0];
@@ -62,10 +62,10 @@ export const placeBulkOrder = async (
 
 export const syncStatus = async (orderId: string, supplierStatus: SupplierOrder["status"]) => {
   try {
-    await fetch(`${API_BASE}/${orderId}/status`, {
+    await fetch(`${API_BASE}/update-status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ supplier_status: supplierStatus }),
+      body: JSON.stringify({ id: orderId, supplier_status: supplierStatus }),
     });
   } catch (err) {
     console.error("Failed to update status on server", err);

@@ -3,7 +3,7 @@ import { LayoutDashboard, Package, RefreshCw, Bell, BarChart3, Radio, Settings, 
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/manager", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/inventory", icon: Package, label: "Inventory" },
   { to: "/rfid-monitor", icon: Radio, label: "RFID Monitor" },
   { to: "/reorders", icon: RefreshCw, label: "Reorders" },
@@ -57,7 +57,7 @@ const Sidebar = () => {
           Settings
         </NavLink>
         <button
-          onClick={() => navigate("/portal")}
+          onClick={() => navigate("/")}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

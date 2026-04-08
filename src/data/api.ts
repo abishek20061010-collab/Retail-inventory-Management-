@@ -1,9 +1,17 @@
-const API_BASE = `http://${window.location.hostname}:5000/api`;
+const API_BASE = `/api`;
 
 export const api = {
   orders: {
     getAll: async () => {
       const res = await fetch(`${API_BASE}/orders`);
+      return await res.json();
+    },
+    updateStatus: async (id: string, supplier_status: string) => {
+      const res = await fetch(`${API_BASE}/orders/update-status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, supplier_status })
+      });
       return await res.json();
     }
   },
@@ -19,7 +27,7 @@ export const api = {
       maxCapacity: number; unitPrice: number; rfidStatus?: string;
       manufactureDate?: string; expiryDate?: string;
     }) => {
-      const res = await fetch(`${API_BASE}/inventory/${id}`, { 
+      const res = await fetch(`${API_BASE}/inventory?id=${id}`, { 
         method: "PUT", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify(data) 
@@ -40,7 +48,7 @@ export const api = {
       return await res.json();
     },
     deleteProduct: async (id: string) => {
-      const res = await fetch(`${API_BASE}/inventory/${id}`, {
+      const res = await fetch(`${API_BASE}/inventory?id=${id}`, {
         method: "DELETE",
       });
       return await res.json();
@@ -52,7 +60,7 @@ export const api = {
       return await res.json();
     },
     markRead: async () => {
-      const res = await fetch(`${API_BASE}/alerts/mark-read`, { method: "PUT" });
+      const res = await fetch(`${API_BASE}/alerts`, { method: "PUT" });
       return await res.json();
     }
   },
@@ -65,22 +73,22 @@ export const api = {
   // Supplier Endpoints
   supplier: {
     getProducts: async () => {
-      const res = await fetch(`${API_BASE}/supplier/products`);
+      const res = await fetch(`${API_BASE}/supplier?path=products`);
       return await res.json();
     },
     getInvoices: async () => {
-      const res = await fetch(`${API_BASE}/supplier/invoices`);
+      const res = await fetch(`${API_BASE}/supplier?path=invoices`);
       return await res.json();
     },
     createInvoice: async (data: any) => {
-      const res = await fetch(`${API_BASE}/supplier/invoices`, { 
+      const res = await fetch(`${API_BASE}/supplier?path=invoices`, { 
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) 
       });
       return await res.json();
     },
     updateInvoiceStatus: async (id: string, status: string) => {
-      const res = await fetch(`${API_BASE}/supplier/invoices/${id}/status`, { 
-        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) 
+      const res = await fetch(`${API_BASE}/supplier?path=invoices`, { 
+        method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) 
       });
       return await res.json();
     }
@@ -88,15 +96,15 @@ export const api = {
   // Customer Endpoints
   customer: {
     getProducts: async () => {
-      const res = await fetch(`${API_BASE}/customer/products`);
+      const res = await fetch(`${API_BASE}/customer?path=products`);
       return await res.json();
     },
     getOrders: async () => {
-      const res = await fetch(`${API_BASE}/customer/orders`);
+      const res = await fetch(`${API_BASE}/customer?path=orders`);
       return await res.json();
     },
     placeOrder: async (orderData: any) => {
-      const res = await fetch(`${API_BASE}/customer/orders`, { 
+      const res = await fetch(`${API_BASE}/customer?path=orders`, { 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify(orderData) 
@@ -107,3 +115,4 @@ export const api = {
     }
   }
 };
+

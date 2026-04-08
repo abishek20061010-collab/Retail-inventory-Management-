@@ -8,7 +8,7 @@ const portals = [
     title: "Manager Portal",
     description: "Inventory management, RFID monitoring, analytics & reorder control",
     icon: ShieldCheck,
-    path: "/",
+    path: "/manager",
     gradient: "from-primary to-[hsl(240,80%,65%)]",
     glow: "glow-primary",
   },

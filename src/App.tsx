@@ -29,10 +29,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           {/* Portal Selection */}
-          <Route path="/portal" element={<Portal />} />
+          <Route path="/" element={<Portal />} />
 
           {/* Manager Portal */}
-          <Route path="/" element={<Index />} />
+          <Route path="/manager" element={<Index />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/rfid-monitor" element={<RfidMonitor />} />
           <Route path="/reorders" element={<Reorders />} />
