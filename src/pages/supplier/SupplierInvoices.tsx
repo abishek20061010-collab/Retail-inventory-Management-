@@ -20,7 +20,7 @@ const SupplierInvoices = () => {
   useEffect(() => { loadData(); }, []);
 
   const deliveredWithoutInvoice = supplierOrders.filter(
-    (o) => o.supplier_status === "delivered" && !invList.find((i) => i.orderId === o.id)
+    (o) => o.supplierStatus === "delivered" && !invList.find((i) => i.orderId === o.id)
   );
 
   const generateInvoice = async (orderId: string) => {
@@ -29,10 +29,10 @@ const SupplierInvoices = () => {
     const newInv = {
       id: `INV-${String(invList.length + 1).padStart(3, "0")}`,
       orderId,
-      productName: order.product_name,
+      productName: order.productName,
       quantity: order.quantity,
-      unitPrice: order.unit_price,
-      totalAmount: order.total_price,
+      unitPrice: order.unitPrice,
+      totalAmount: order.totalPrice,
       status: "draft",
       createdAt: new Date().toISOString(),
       dueDate: "2026-04-15",
@@ -61,8 +61,8 @@ const SupplierInvoices = () => {
             {deliveredWithoutInvoice.map((o) => (
               <div key={o.id} className="flex items-center justify-between rounded-lg bg-secondary/50 p-3">
                 <div>
-                  <p className="text-sm text-foreground">{o.product_name}</p>
-                  <p className="text-xs text-muted-foreground">{o.id} · ₹{parseFloat(o.total_price).toFixed(2)}</p>
+                  <p className="text-sm text-foreground">{o.productName}</p>
+                  <p className="text-xs text-muted-foreground">{o.id} · ₹{parseFloat(o.totalPrice).toFixed(2)}</p>
                 </div>
                 <Button size="sm" onClick={() => generateInvoice(o.id)} className="text-xs">
                   <FileText className="h-3.5 w-3.5 mr-1" /> Generate
